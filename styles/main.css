@@ -778,3 +778,16 @@ mark {
 .content-section {
     scroll-margin-top: 100px;
 }
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-light);
+}
+
+footer p {
+    margin: 0;
+}
