@@ -1,3 +1,4 @@
+// scripts/stats.js
 
 /**
  * Calculates statistics from records
@@ -16,7 +17,6 @@ export const getStats = (records) => {
     const totalDuration = records.reduce((sum, record) => sum + record.duration, 0);
     const averageDuration = totalDuration / total;
 
-    // Count records by tag
     const recordsByTag = {};
     records.forEach(record => {
         const tag = record.tag || 'Uncategorized';
@@ -59,7 +59,6 @@ export const getTopTag = (records) => {
  */
 export const calculateTrend = (records) => {
     if (!records || records.length === 0) {
-        // Return last 7 days with zero values
         const days = [];
         for (let i = 6; i >= 0; i--) {
             const date = new Date();
@@ -73,12 +72,10 @@ export const calculateTrend = (records) => {
         return days;
     }
 
-    // Get records from the last 7 days
     const today = new Date();
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    // Group records by date
     const dailyTotals = {};
     records.forEach(record => {
         const recordDate = new Date(record.dueDate);
@@ -88,7 +85,6 @@ export const calculateTrend = (records) => {
         }
     });
 
-    // Build trend data for last 7 days
     const trend = [];
     for (let i = 6; i >= 0; i--) {
         const date = new Date();
@@ -159,14 +155,4 @@ export const getOverdueRecords = (records) => {
         const dueDate = new Date(record.dueDate);
         return dueDate < today;
     }).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-};
-
-/**
- * Calculates completion rate for records
- */
-export const getCompletionRate = (records) => {
-    if (!records || records.length === 0) return 0;
-
-    const completed = records.filter(r => r.completed).length;
-    return (completed / records.length) * 100;
 };
