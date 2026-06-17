@@ -1,0 +1,47 @@
+[
+  {
+    "id": "rec_001",
+    "title": "Study for Math Final",
+    "dueDate": "2026-01-25",
+    "duration": 180,
+    "tag": "Academics",
+    "createdAt": "2026-01-15T10:00:00Z",
+    "updatedAt": "2026-01-15T10:00:00Z"
+  },
+  {
+    "id": "rec_002",
+    "title": "Submit Physics Lab Report",
+    "dueDate": "2026-01-28",
+    "duration": 90,
+    "tag": "Academics",
+    "createdAt": "2026-01-16T14:30:00Z",
+    "updatedAt": "2026-01-16T14:30:00Z"
+  },
+  {
+    "id": "rec_003",
+    "title": "Club Meeting - AI Discussion",
+    "dueDate": "2026-01-20",
+    "duration": 60,
+    "tag": "Club Meeting",
+    "createdAt": "2026-01-17T09:00:00Z",
+    "updatedAt": "2026-01-17T09:00:00Z"
+  },
+  {
+    "id": "rec_004",
+    "title": "Library Study Session",
+    "dueDate": "2026-01-22",
+    "duration": 120,
+    "tag": "Study Session",
+    "createdAt": "2026-01-18T11:00:00Z",
+    "updatedAt": "2026-01-18T11:00:00Z"
+  },
+  {
+    "id": "rec_005",
+    "title": "Complete Programming Assignment",
+    "dueDate": "2026-02-01",
+    "duration": 240,
+    "tag": "Academics",
+    "createdAt": "2026-01-19T08:00:00Z",
+    "updatedAt": "2026-01-19T08:00:00Z"
+  }
+]
