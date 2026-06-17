@@ -331,4 +331,160 @@ const setupSettings = () => {
     
     // Clear data
     document.getElementById('clear-data-btn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear ALL data? This cannot be
+        if (confirm('Are you sure you want to clear ALL data? This cannot be undone.')) {
+            clearAllData();
+            state.records = [];
+            state.settings = loadSettings();
+            renderAll();
+            showStatus('All data cleared!', 'info');
+        }
+    });
+    
+    // Unit selector
+    document.getElementById('unit-select').addEventListener('change', (e) => {
+        state.settings.unit = e.target.value;
+        saveSettings(state.settings);
+        renderAll();
+    });
+    
+    // Set target
+    document.getElementById('set-target-btn').addEventListener('click', () => {
+        const targetInput = document.getElementById('target-input');
+        const target = parseInt(targetInput.value);
+        if (target < 0 || isNaN(target)) {
+            showStatus('Please enter a valid target (positive number)', 'error');
+            return;
+        }
+        state.settings.weeklyTarget = target;
+        saveSettings(state.settings);
+        renderAll();
+        showStatus(`Weekly target set to ${target} minutes`, 'success');
+    });
+    
+    // Load settings values
+    document.getElementById('unit-select').value = state.settings.unit || 'minutes';
+    document.getElementById('target-input').value = state.settings.weeklyTarget || 300;
+};
+
+/**
+ * Sets up theme toggle
+ */
+const setupTheme = () => {
+    const navThemeToggle = document.getElementById('theme-toggle-nav');
+    const settingsThemeToggle = document.getElementById('theme-toggle-settings');
+    
+    // Check for saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        updateThemeButtons('Dark Mode');
+    }
+    
+    const toggleTheme = () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeButtons(isDark ? 'Dark Mode' : 'Light Mode');
+    };
+    
+    if (navThemeToggle) {
+        navThemeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    if (settingsThemeToggle) {
+        settingsThemeToggle.addEventListener('click', toggleTheme);
+    }
+};
+
+/**
+ * Updates theme button text
+ */
+const updateThemeButtons = (text) => {
+    const buttons = document.querySelectorAll('.theme-btn-nav, #theme-toggle-settings');
+    buttons.forEach(btn => {
+        if (btn) btn.textContent = text;
+    });
+};
+
+/**
+ * Sets up keyboard shortcuts
+ */
+const setupKeyboardShortcuts = () => {
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+1 through Ctrl+5 for navigation
+        if (e.ctrlKey && e.key >= '1' && e.key <= '5') {
+            e.preventDefault();
+            const sections = ['dashboard', 'records', 'add-record', 'settings', 'about'];
+            const index = parseInt(e.key) - 1;
+            if (index < sections.length) {
+                const button = document.querySelector(`.nav-btn[data-section="${sections[index]}"]`);
+                if (button) button.click();
+            }
+        }
+        
+        // Escape to cancel form
+        if (e.key === 'Escape') {
+            const cancelBtn = document.getElementById('cancel-btn');
+            if (!cancelBtn.hidden) {
+                resetForm();
+            }
+        }
+    });
+};
+
+/**
+ * Renders all components
+ */
+const renderAll = () => {
+    // Render records
+    const searchPattern = document.getElementById('search-input')?.value || '';
+    renderRecords(state.records, searchPattern);
+    
+    // Render stats
+    renderStats(state.records);
+    
+    // Render cap/target
+    const target = state.settings.weeklyTarget || 300;
+    renderCap(state.records, target);
+};
+
+/**
+ * Shows a status message
+ */
+const showStatus = (message, type = 'info') => {
+    let statusContainer = document.getElementById('status-container');
+    if (!statusContainer) {
+        statusContainer = document.createElement('div');
+        statusContainer.id = 'status-container';
+        statusContainer.setAttribute('role', 'status');
+        statusContainer.setAttribute('aria-live', 'polite');
+        document.body.appendChild(statusContainer);
+    }
+    
+    statusContainer.textContent = message;
+    statusContainer.className = `status-message ${type}`;
+    statusContainer.style.display = 'block';
+    
+    clearTimeout(statusContainer._timeout);
+    statusContainer._timeout = setTimeout(() => {
+        statusContainer.style.display = 'none';
+    }, 5000);
+};
+
+/**
+ * Loads seed data
+ */
+const loadSeedData = async () => {
+    try {
+        const response = await fetch('seed.json');
+        if (response.ok) {
+            const seedData = await response.json();
+            state.records = seedData;
+            saveRecords(state.records);
+            renderAll();
+            showStatus('Loaded sample data!', 'info');
+        }
+    } catch (error) {
+        console.log('No seed data found');
+    }
+};
