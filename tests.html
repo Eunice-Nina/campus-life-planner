@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regex Validation Tests</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .test {
+            background: white;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test.fail {
+            border-left-color: #f44336;
+        }
+        .test .result {
+            font-weight: bold;
+        }
+        .test .pass {
+            color: #4CAF50;
+        }
+        .test .fail {
+            color: #f44336;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .summary {
+            background: #333;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Regex Validator Tests</h1>
+    <div id="summary" class="summary">Running tests...</div>
+    <div id="results"></div>
+
+    <script type="module">
+        import * as validators from './scripts/validators.js';
+
+        const results = document.getElementById('results');
+        const summary = document.getElementById('summary');
+        let passed = 0;
+        let total = 0;
+
+        function runTest(name, testFn, expected = true) {
+            total++;
+            const result = testFn();
+            const isPass = result === expected;
+            if (isPass) passed++;
+            
+            const div = document.createElement('div');
+            div.className = `test ${isPass ? '' : 'fail'}`;
+            div.innerHTML = `
+                <div>
+                    <strong>${name}</strong>
+                    <span class="result ${isPass ? 'pass' : 'fail'}">
+                        ${isPass ? 'PASS' : 'FAIL'}
+                    </span>
+                </div>
+                <div>Result: <pre>${String(result)}</pre></div>
+                <div>Expected: <pre>${String(expected)}</pre></div>
+            `;
+            results.appendChild(div);
+        }
+
+        // Title Validator Tests
+        runTest('Title: "Study" (valid)', () => validators.validateTitle('Study'), true);
+        runTest('Title: " Study" (invalid - leading space)', () => validators.validateTitle(' Study'), false);
+        runTest('Title: "Study " (invalid - trailing space)', () => validators.validateTitle('Study '), false);
+        runTest('Title: " " (invalid - only spaces)', () => validators.validateTitle(' '), false);
+        runTest('Title: "Math 101" (valid)', () => validators.validateTitle('Math 101'), true);
+
+        // Date Validator Tests
+        runTest('Date: "2026-01-25" (valid)', () => validators.validateDate('2026-01-25'), true);
+        runTest('Date: "2026-13-01" (invalid - month)', () => validators.validateDate('2026-13-01'), false);
+        runTest('Date: "2026-00-01" (invalid - month)', () => validators.validateDate('2026-00-01'), false);
+        runTest('Date: "2026-01-32" (invalid - day)', () => validators.validateDate('2026-01-32'), false);
+        runTest('Date: "25-01-2026" (invalid - format)', () => validators.validateDate('25-01-2026'), false);
+
+        // Duration Validator Tests
+        runTest('Duration: "120" (valid)', () => validators.validateDuration('120'), true);
+        runTest('Duration: "0" (valid)', () => validators.validateDuration('0'), true);
+        runTest('Duration: "1.5" (invalid - decimal)', () => validators.validateDuration('1.5'), false);
+        runTest('Duration: "-10" (invalid - negative)', () => validators.validateDuration('-10'), false);
+        runTest('Duration: "abc" (invalid - letters)', () => validators.validateDuration('abc'), false);
+
+        // Tag Validator Tests
+        runTest('Tag: "Academics" (valid)', () => validators.validateTag('Academics'), true);
+        runTest('Tag: "Club Meeting" (valid)', () => validators.validateTag('Club Meeting'), true);
+        runTest('Tag: "Academics!" (invalid - special char)', () => validators.validateTag('Academics!'), false);
+        runTest('Tag: " Academics" (invalid - leading space)', () => validators.validateTag(' Academics'), false);
+        runTest('Tag: "Academics " (invalid - trailing space)', () => validators.validateTag('Academics '), false);
+
+        // Advanced: Duplicate Words
+        runTest('Duplicate Words: "the the" (detected)', () => validators.hasDuplicateWords('the the'), true);
+        runTest('Duplicate Words: "test test test" (detected)', () => validators.hasDuplicateWords('test test test'), true);
+        runTest('Duplicate Words: "the quick brown fox" (none)', () => validators.hasDuplicateWords('the quick brown fox'), false);
+
+        // Advanced: Time Tokens
+        runTest('Time Tokens: "14:30" (found)', () => validators.findTimeTokens('Meeting at 14:30').length, 1);
+        runTest('Time Tokens: "14:30 and 16:45" (found 2)', () => validators.findTimeTokens('14:30 and 16:45').length, 2);
+        runTest('Time Tokens: "No time here" (none)', () => validators.findTimeTokens('No time here').length, 0);
+
+        // Safe Regex Compiler
+        runTest('Compile Regex: valid pattern', () => {
+            const regex = validators.compileRegex('test');
+            return regex instanceof RegExp;
+        }, true);
+        runTest('Compile Regex: invalid pattern', () => {
+            const regex = validators.compileRegex('[');
+            return regex === null;
+        }, true);
+
+        // Update summary
+        const percentage = ((passed / total) * 100).toFixed(1);
+        summary.textContent = passed + '/' + total + ' tests passed (' + percentage + '%)';
+        summary.style.background = passed === total ? '#4CAF50' : '#f44336';
+    </script>
+</body>
+</html>
