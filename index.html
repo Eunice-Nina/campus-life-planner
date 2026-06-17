@@ -12,38 +12,57 @@
     <header role="banner">
         <div class="header-content">
             <h1>Campus Life Planner</h1>
-            <div class="header-controls">
-                <button id="theme-toggle" aria-label="Toggle dark/light mode" class="theme-btn">
-                    Dark Mode
-                </button>
-            </div>
         </div>
         <nav role="navigation" aria-label="Main navigation">
             <ul>
-                <li><button data-section="dashboard" aria-current="page">Dashboard</button></li>
-                <li><button data-section="records">Records</button></li>
-                <li><button data-section="add-record">Add Record</button></li>
-                <li><button data-section="settings">Settings</button></li>
-                <li><button data-section="about">About</button></li>
+                <li><button data-section="dashboard" class="nav-btn active">Dashboard</button></li>
+                <li><button data-section="records" class="nav-btn">Records</button></li>
+                <li><button data-section="add-record" class="nav-btn">Add Record</button></li>
+                <li><button data-section="settings" class="nav-btn">Settings</button></li>
+                <li class="nav-about-wrapper">
+                    <button data-section="about" class="nav-btn">About</button>
+                    <button id="theme-toggle-nav" class="theme-btn-nav">Dark Mode</button>
+                </li>
             </ul>
         </nav>
     </header>
 
     <main id="main-content" role="main">
         <!-- Dashboard Section -->
-        <section id="section-dashboard" role="region" aria-labelledby="dashboard-heading">
-            <h2 id="dashboard-heading">Dashboard</h2>
+        <section id="section-dashboard" class="content-section">
+            <h2>Dashboard</h2>
             <div id="stats-container" role="region" aria-live="polite" aria-atomic="true">
-                <!-- Stats will be rendered here -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Total Minutes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">N/A</div>
+                        <div class="stat-label">Top Tag</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">0</div>
+                        <div class="stat-label">Avg Minutes</div>
+                    </div>
+                </div>
             </div>
             <div id="cap-container" role="region" aria-live="assertive" aria-atomic="true">
-                <!-- Cap/target info will be rendered here -->
+                <div class="cap-display">
+                    <p><strong>Weekly Target:</strong> 300 minutes</p>
+                    <p><strong>Current Progress:</strong> 0 minutes</p>
+                    <p class="success">Remaining time: 300 minutes to reach your weekly target</p>
+                </div>
             </div>
         </section>
 
         <!-- Records Section -->
-        <section id="section-records" role="region" aria-labelledby="records-heading" hidden>
-            <h2 id="records-heading">Records</h2>
+        <section id="section-records" class="content-section">
+            <h2>Records</h2>
             <div class="search-container">
                 <label for="search-input">Search records (regex supported):</label>
                 <div class="search-wrapper">
@@ -52,13 +71,16 @@
                 </div>
             </div>
             <div id="records-container">
-                <!-- Records will be rendered here -->
+                <div class="empty-state">
+                    <p>No records found</p>
+                    <p>Start by adding your first record!</p>
+                </div>
             </div>
         </section>
 
         <!-- Add/Edit Record Section -->
-        <section id="section-add-record" role="region" aria-labelledby="form-heading" hidden>
-            <h2 id="form-heading">Add New Record</h2>
+        <section id="section-add-record" class="content-section">
+            <h2>Add New Record</h2>
             <form id="record-form" novalidate>
                 <div class="form-group">
                     <label for="record-title">Title *</label>
@@ -89,8 +111,8 @@
         </section>
 
         <!-- Settings Section -->
-        <section id="section-settings" role="region" aria-labelledby="settings-heading" hidden>
-            <h2 id="settings-heading">Settings</h2>
+        <section id="section-settings" class="content-section">
+            <h2>Settings</h2>
             
             <div class="settings-grid">
                 <div class="settings-card">
@@ -146,8 +168,8 @@
         </section>
 
         <!-- About Section -->
-        <section id="section-about" role="region" aria-labelledby="about-heading" hidden>
-            <h2 id="about-heading">About Campus Life Planner</h2>
+        <section id="section-about" class="content-section">
+            <h2>About Campus Life Planner</h2>
             <div class="about-content">
                 <div class="about-card">
                     <h3>Purpose</h3>
