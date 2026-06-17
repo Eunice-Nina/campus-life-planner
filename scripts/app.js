@@ -1,15 +1,14 @@
 // scripts/app.js
 
-import { loadRecords, saveRecords, loadSettings, saveSettings, exportJSON, importJSON, clearAllData, generateId, validateRecordStructure } from './storage.js';
+import { loadRecords, saveRecords, loadSettings, saveSettings, exportJSON, importJSON, clearAllData, generateId } from './storage.js';
 import { renderRecords, renderStats, renderCap, updateSearch } from './ui.js';
-import { validateTitle, validateDate, validateDuration, validateTag, validateRecord } from './validators.js';
-import { getStats, calculateWeeklyProgress } from './stats.js';
+import { validateTitle, validateDate, validateDuration, validateTag } from './validators.js';
 
 // App state
 let state = {
     records: [],
     settings: {},
-    currentSection: 'about'
+    currentSection: 'dashboard'
 };
 
 // Initialize app
@@ -30,61 +29,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup settings
     setupSettings();
     
-    // Setup theme toggle (if implemented)
+    // Setup theme
     setupTheme();
-    
-    // Show initial section
-    showSection('about');
     
     // Render initial data
     renderAll();
     
     // Setup keyboard shortcuts
     setupKeyboardShortcuts();
+    
+    // Load seed data if empty
+    if (state.records.length === 0) {
+        loadSeedData();
+    }
 });
 
 /**
  * Sets up navigation between sections
  */
 const setupNavigation = () => {
-    const navButtons = document.querySelectorAll('nav button');
+    const navButtons = document.querySelectorAll('.nav-btn');
     navButtons.forEach(button => {
         button.addEventListener('click', () => {
             const section = button.dataset.section;
-            showSection(section);
             
-            // Update ARIA current page
-            navButtons.forEach(btn => btn.removeAttribute('aria-current'));
-            button.setAttribute('aria-current', 'page');
+            // Update active class
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Scroll to the section
+            const targetSection = document.getElementById(`section-${section}`);
+            if (targetSection) {
+                targetSection.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         });
     });
-};
-
-/**
- * Shows a specific section and hides others
- */
-const showSection = (sectionId) => {
-    // Hide all sections
-    document.querySelectorAll('main > section').forEach(section => {
-        section.hidden = true;
-    });
-    
-    // Show the target section
-    const targetSection = document.getElementById(`section-${sectionId}`);
-    if (targetSection) {
-        targetSection.hidden = false;
-        state.currentSection = sectionId;
-        
-        // Update stats when showing dashboard
-        if (sectionId === 'dashboard') {
-            renderAll();
-        }
-        
-        // Update records when showing records
-        if (sectionId === 'records') {
-            renderAll();
-        }
-    }
 };
 
 /**
@@ -254,8 +236,14 @@ const editRecord = (record) => {
     document.getElementById('cancel-btn').hidden = false;
     document.getElementById('form-heading').textContent = 'Edit Record';
     
-    // Switch to add section
-    showSection('add-record');
+    // Scroll to add section
+    const targetSection = document.getElementById('section-add-record');
+    if (targetSection) {
+        targetSection.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
     
     // Validate after loading
     setTimeout(validateForm, 0);
@@ -320,6 +308,9 @@ const setupSettings = () => {
         const file = e.target.files[0];
         if (!file) return;
         
+        const fileNameSpan = document.getElementById('file-name');
+        fileNameSpan.textContent = file.name;
+        
         const reader = new FileReader();
         reader.onload = (event) => {
             const result = importJSON(event.target.result);
@@ -335,163 +326,9 @@ const setupSettings = () => {
             }
         };
         reader.readAsText(file);
-        e.target.value = ''; // Reset file input
+        e.target.value = '';
     });
     
     // Clear data
     document.getElementById('clear-data-btn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to clear ALL data? This cannot be undone.')) {
-            clearAllData();
-            state.records = [];
-            state.settings = loadSettings();
-            renderAll();
-            showStatus('All data cleared!', 'info');
-        }
-    });
-    
-    // Unit selector
-    document.getElementById('unit-select').addEventListener('change', (e) => {
-        state.settings.unit = e.target.value;
-        saveSettings(state.settings);
-        renderAll();
-    });
-    
-    // Set target
-    document.getElementById('set-target-btn').addEventListener('click', () => {
-        const targetInput = document.getElementById('target-input');
-        const target = parseInt(targetInput.value);
-        if (target < 0 || isNaN(target)) {
-            showStatus('Please enter a valid target (positive number)', 'error');
-            return;
-        }
-        state.settings.weeklyTarget = target;
-        saveSettings(state.settings);
-        renderAll();
-        showStatus(`Weekly target set to ${target} minutes`, 'success');
-    });
-    
-    // Load settings values
-    document.getElementById('unit-select').value = state.settings.unit || 'minutes';
-    document.getElementById('target-input').value = state.settings.weeklyTarget || 300;
-};
-
-/**
- * Sets up theme toggle (optional stretch goal)
- */
-const setupTheme = () => {
-    // This would be implemented for light/dark theme toggle
-    // For now, just use the default theme
-};
-
-/**
- * Sets up keyboard shortcuts
- */
-const setupKeyboardShortcuts = () => {
-    document.addEventListener('keydown', (e) => {
-        // Ctrl+1 through Ctrl+5 for navigation
-        if (e.ctrlKey && e.key >= '1' && e.key <= '5') {
-            e.preventDefault();
-            const sections = ['about', 'dashboard', 'records', 'add-record', 'settings'];
-            const index = parseInt(e.key) - 1;
-            if (index < sections.length) {
-                const button = document.querySelector(`nav button[data-section="${sections[index]}"]`);
-                if (button) button.click();
-            }
-        }
-        
-        // Escape to cancel form
-        if (e.key === 'Escape' && state.currentSection === 'add-record') {
-            const cancelBtn = document.getElementById('cancel-btn');
-            if (!cancelBtn.hidden) {
-                resetForm();
-            }
-        }
-    });
-};
-
-/**
- * Renders all components
- */
-const renderAll = () => {
-    // Render records
-    const searchPattern = document.getElementById('search-input')?.value || '';
-    renderRecords(state.records, searchPattern);
-    
-    // Render stats
-    renderStats(state.records);
-    
-    // Render cap/target
-    const target = state.settings.weeklyTarget || 300;
-    renderCap(state.records, target);
-};
-
-/**
- * Shows a status message
- */
-const showStatus = (message, type = 'info') => {
-    // Create or get status container
-    let statusContainer = document.getElementById('status-container');
-    if (!statusContainer) {
-        statusContainer = document.createElement('div');
-        statusContainer.id = 'status-container';
-        statusContainer.setAttribute('role', 'status');
-        statusContainer.setAttribute('aria-live', 'polite');
-        document.body.appendChild(statusContainer);
-    }
-    
-    statusContainer.textContent = message;
-    statusContainer.className = `status-message ${type}`;
-    statusContainer.style.display = 'block';
-    
-    // Clear after 5 seconds
-    clearTimeout(statusContainer._timeout);
-    statusContainer._timeout = setTimeout(() => {
-        statusContainer.style.display = 'none';
-    }, 5000);
-};
-
-// Add some CSS for status messages
-const style = document.createElement('style');
-style.textContent = `
-    #status-container {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        border-radius: 8px;
-        background: #333;
-        color: white;
-        max-width: 400px;
-        z-index: 1000;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        display: none;
-        animation: slideUp 0.3s ease;
-    }
-    
-    #status-container.success {
-        background: #2ECC71;
-    }
-    
-    #status-container.error {
-        background: #E74C3C;
-    }
-    
-    #status-container.info {
-        background: #3498DB;
-    }
-    
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);
-
-// Make functions available for testing
-export { state, renderAll, showStatus };
+        if (confirm('Are you sure you want to clear ALL data? This cannot be
