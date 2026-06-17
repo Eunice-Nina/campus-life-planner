@@ -1,6 +1,6 @@
+// scripts/ui.js
 
-
-import { filterRecords, getHighlightedRecord, parseSearchQuery, highlight } from './search.js';
+import { filterRecords, getHighlightedRecord } from './search.js';
 import { getStats, calculateTrend, getTopTag } from './stats.js';
 
 let currentRecords = [];
@@ -15,6 +15,8 @@ export const renderRecords = (records, searchPattern = '') => {
     currentSearch = searchPattern;
     
     const container = document.getElementById('records-container');
+    if (!container) return;
+    
     const isMobile = window.innerWidth < 768;
     
     if (records.length === 0) {
@@ -46,7 +48,6 @@ export const renderRecords = (records, searchPattern = '') => {
         container.innerHTML = renderTable(sorted, searchPattern);
     }
 
-    // Attach event listeners
     attachRecordEvents();
 };
 
@@ -168,31 +169,25 @@ const formatDuration = (minutes) => {
  * Attaches event listeners to record buttons
  */
 const attachRecordEvents = () => {
-    // Edit buttons
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = e.target.dataset.id;
             const record = currentRecords.find(r => r.id === id);
             if (record) {
-                // Trigger edit event
                 const event = new CustomEvent('editRecord', { detail: record });
                 document.dispatchEvent(event);
             }
         });
     });
 
-    // Delete buttons
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = e.target.dataset.id;
-            if (confirm('Are you sure you want to delete this record?')) {
-                const event = new CustomEvent('deleteRecord', { detail: { id } });
-                document.dispatchEvent(event);
-            }
+            const event = new CustomEvent('deleteRecord', { detail: { id } });
+            document.dispatchEvent(event);
         });
     });
 
-    // Sort headers
     document.querySelectorAll('th[data-sort]').forEach(th => {
         th.addEventListener('click', () => {
             const field = th.dataset.sort;
