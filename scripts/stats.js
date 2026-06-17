@@ -1,4 +1,3 @@
-// scripts/stats.js
 
 /**
  * Calculates statistics from records
