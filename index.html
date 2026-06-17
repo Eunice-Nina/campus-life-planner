@@ -10,32 +10,28 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header role="banner">
-        <h1> Campus Life Planner</h1>
+        <div class="header-content">
+            <h1>Campus Life Planner</h1>
+            <div class="header-controls">
+                <button id="theme-toggle" aria-label="Toggle dark/light mode" class="theme-btn">
+                    Dark Mode
+                </button>
+            </div>
+        </div>
         <nav role="navigation" aria-label="Main navigation">
             <ul>
-                <li><button data-section="about" aria-current="page">About</button></li>
-                <li><button data-section="dashboard">Dashboard</button></li>
+                <li><button data-section="dashboard" aria-current="page">Dashboard</button></li>
                 <li><button data-section="records">Records</button></li>
                 <li><button data-section="add-record">Add Record</button></li>
                 <li><button data-section="settings">Settings</button></li>
+                <li><button data-section="about">About</button></li>
             </ul>
         </nav>
     </header>
 
     <main id="main-content" role="main">
-        <!-- About Section -->
-        <section id="section-about" role="region" aria-labelledby="about-heading">
-            <h2 id="about-heading">About Campus Life Planner</h2>
-            <p>Your all-in-one solution for managing campus tasks and events efficiently.</p>
-            <div class="contact-info">
-                <h3>Contact</h3>
-                <p>GitHub: <a href="https://github.com/Eunice-Nina" target="_blank">github.com/Eunice-Nina</a></p>
-                <p>Email: <a href="mailto:s.eunice@alustudent.com">s.eunice@alustudent.com</a></p>
-            </div>
-        </section>
-
         <!-- Dashboard Section -->
-        <section id="section-dashboard" role="region" aria-labelledby="dashboard-heading" hidden>
+        <section id="section-dashboard" role="region" aria-labelledby="dashboard-heading">
             <h2 id="dashboard-heading">Dashboard</h2>
             <div id="stats-container" role="region" aria-live="polite" aria-atomic="true">
                 <!-- Stats will be rendered here -->
@@ -50,8 +46,10 @@
             <h2 id="records-heading">Records</h2>
             <div class="search-container">
                 <label for="search-input">Search records (regex supported):</label>
-                <input type="text" id="search-input" placeholder="e.g., @tag:Academics or Study">
-                <button id="clear-search" aria-label="Clear search">✕</button>
+                <div class="search-wrapper">
+                    <input type="text" id="search-input" placeholder="e.g., @tag:Academics or Study">
+                    <button id="clear-search" aria-label="Clear search">Clear</button>
+                </div>
             </div>
             <div id="records-container">
                 <!-- Records will be rendered here -->
@@ -64,7 +62,7 @@
             <form id="record-form" novalidate>
                 <div class="form-group">
                     <label for="record-title">Title *</label>
-                    <input type="text" id="record-title" required aria-describedby="title-error">
+                    <input type="text" id="record-title" required aria-describedby="title-error" placeholder="Enter task title">
                     <div id="title-error" class="error-message" role="alert"></div>
                 </div>
                 <div class="form-group">
@@ -74,7 +72,7 @@
                 </div>
                 <div class="form-group">
                     <label for="record-duration">Duration (minutes) *</label>
-                    <input type="number" id="record-duration" required min="0" aria-describedby="duration-error">
+                    <input type="number" id="record-duration" required min="0" aria-describedby="duration-error" placeholder="e.g., 120">
                     <div id="duration-error" class="error-message" role="alert"></div>
                 </div>
                 <div class="form-group">
@@ -93,35 +91,103 @@
         <!-- Settings Section -->
         <section id="section-settings" role="region" aria-labelledby="settings-heading" hidden>
             <h2 id="settings-heading">Settings</h2>
-            <div class="settings-section">
-                <h3>Data Management</h3>
-                <button id="export-btn">Export JSON</button>
-                <div>
-                    <label for="import-input">Import JSON:</label>
-                    <input type="file" id="import-input" accept=".json">
+            
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3>Data Management</h3>
+                    <div class="settings-item">
+                        <button id="export-btn" class="btn-primary">Export JSON</button>
+                        <span class="settings-hint">Download all records as JSON file</span>
+                    </div>
+                    <div class="settings-item">
+                        <label for="import-input" class="file-upload-label">
+                            Import JSON
+                            <input type="file" id="import-input" accept=".json">
+                        </label>
+                        <span id="file-name" class="settings-hint">No file chosen</span>
+                    </div>
+                    <div class="settings-item">
+                        <button id="clear-data-btn" class="btn-danger">Clear All Data</button>
+                        <span class="settings-hint warning">This action cannot be undone</span>
+                    </div>
                 </div>
-                <button id="clear-data-btn" class="danger">Clear All Data</button>
+
+                <div class="settings-card">
+                    <h3>Units and Display</h3>
+                    <div class="settings-item">
+                        <label for="unit-select">Duration Display:</label>
+                        <select id="unit-select">
+                            <option value="minutes">Minutes</option>
+                            <option value="hours">Hours</option>
+                        </select>
+                    </div>
+                    <div id="conversion-display" class="settings-hint"></div>
+                </div>
+
+                <div class="settings-card">
+                    <h3>Weekly Target</h3>
+                    <div class="settings-item">
+                        <label for="target-input">Set weekly study target (minutes):</label>
+                        <div class="target-input-group">
+                            <input type="number" id="target-input" min="0" value="300">
+                            <button id="set-target-btn" class="btn-secondary">Set Target</button>
+                        </div>
+                    </div>
+                    <div id="target-status" class="settings-hint"></div>
+                </div>
+
+                <div class="settings-card">
+                    <h3>Appearance</h3>
+                    <div class="settings-item">
+                        <button id="theme-toggle-settings" class="btn-secondary">Toggle Dark/Light Mode</button>
+                    </div>
+                </div>
             </div>
-            <div class="settings-section">
-                <h3>Units</h3>
-                <label for="unit-select">Duration Display:</label>
-                <select id="unit-select">
-                    <option value="minutes">Minutes</option>
-                    <option value="hours">Hours</option>
-                </select>
-                <p id="conversion-display"></p>
-            </div>
-            <div class="settings-section">
-                <h3>Weekly Target</h3>
-                <label for="target-input">Set weekly study target (minutes):</label>
-                <input type="number" id="target-input" min="0" value="300">
-                <button id="set-target-btn">Set Target</button>
+        </section>
+
+        <!-- About Section -->
+        <section id="section-about" role="region" aria-labelledby="about-heading" hidden>
+            <h2 id="about-heading">About Campus Life Planner</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>Purpose</h3>
+                    <p>Your all-in-one solution for managing campus tasks and events efficiently. Track assignments, study sessions, club meetings, and more - all in one place.</p>
+                </div>
+                
+                <div class="about-card">
+                    <h3>Features</h3>
+                    <ul class="feature-list">
+                        <li>Create and manage tasks with due dates</li>
+                        <li>Advanced regex-powered search</li>
+                        <li>Real-time statistics and trends</li>
+                        <li>Automatic data persistence</li>
+                        <li>Fully responsive design</li>
+                        <li>Accessible for all users</li>
+                    </ul>
+                </div>
+
+                <div class="about-card">
+                    <h3>Contact</h3>
+                    <p>GitHub: <a href="https://github.com/Eunice-Nina" target="_blank">github.com/Eunice-Nina</a></p>
+                    <p>Email: <a href="mailto:s.eunice@alustudent.com">s.eunice@alustudent.com</a></p>
+                </div>
+
+                <div class="about-card">
+                    <h3>Technologies</h3>
+                    <ul class="tech-list">
+                        <li>Vanilla HTML5</li>
+                        <li>Vanilla CSS3 with Flexbox and Grid</li>
+                        <li>Vanilla JavaScript (ES Modules)</li>
+                        <li>LocalStorage for persistence</li>
+                        <li>Regex for validation and search</li>
+                    </ul>
+                </div>
             </div>
         </section>
     </main>
 
     <footer role="contentinfo">
-        <p>&copy; 2026 Campus Life Planner. All rights reserved.</p>
+        <p>2026 Campus Life Planner. All rights reserved.</p>
     </footer>
 
     <script type="module" src="scripts/app.js"></script>
