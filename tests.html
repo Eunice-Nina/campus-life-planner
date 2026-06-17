@@ -46,7 +46,6 @@
             margin: 1rem 0;
         }
     </style>
-    
 </head>
 <body>
     <h1>Regex Validator Tests</h1>
@@ -130,7 +129,6 @@
             return regex === null;
         }, true);
 
-        // Update summary
         const percentage = ((passed / total) * 100).toFixed(1);
         summary.textContent = passed + '/' + total + ' tests passed (' + percentage + '%)';
         summary.style.background = passed === total ? '#4CAF50' : '#f44336';
