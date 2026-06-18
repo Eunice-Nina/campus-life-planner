@@ -9,7 +9,7 @@ Built with **vanilla HTML, CSS, and JavaScript**. No frameworks. No external dep
 ## Live Project
 
 - **Project URL:** [https://eunice-nina.github.io/campus-life-planner/](https://eunice-nina.github.io/campus-life-planner/)
-- **Demo Video:** [https://youtu.be/your-video-link-here](https://youtu.be/your-video-link-here)
+- **Demo Video:** https://youtu.be/nAduw0ffST4
 
 ---
 
