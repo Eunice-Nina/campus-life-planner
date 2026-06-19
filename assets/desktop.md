@@ -1,1 +1,1 @@
-https://docs.google.com/document/d/1bwYqpCcUjGxNCVqWH-er_rHNI63CcptpJOqheBrnQsc/edit?usp=sharing
+[Desktop View](https://docs.google.com/document/d/1bwYqpCcUjGxNCVqWH-er_rHNI63CcptpJOqheBrnQsc/edit?usp=sharing)
